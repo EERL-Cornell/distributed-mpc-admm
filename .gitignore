@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# Simulation results
+simulation_results_*/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS-specific
+.DS_Store

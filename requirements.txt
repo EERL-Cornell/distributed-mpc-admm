@@ -1,0 +1,7 @@
+numpy
+pandas
+casadi
+plotly
+tenseal
+pyfmi
+pykalman

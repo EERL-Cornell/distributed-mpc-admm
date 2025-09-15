@@ -1,0 +1,26 @@
+{
+    "intercept": 1.738175150111875,
+    "coefficients": {
+        "T_indoor": -570117.5521680375,
+        "T_outdoor_dry": 1257519.96662517,
+        "Single_setpoint": -687402.3703876222,
+        "T_outdoor_wet": 0.046237753959758265,
+        "T_waterMains": -0.3701642949125734,
+        "T_sky": -0.004812125605894835,
+        "People_count": -1.0653798001785617,
+        "Diffuse_solar_radiation": -3493547243.974824,
+        "Direct_solar_radiation": -3493547243.972598,
+        "Wind_speed": 0.0228349952226381,
+        "Relative_humidity": -0.002785220953228418,
+        "P_hvac_lag_1": 0.8434770387902972,
+        "hour": -0.00021721400116803125,
+        "day_of_week": -0.005002152402084903,
+        "hour_sin": 0.09946760327875381,
+        "hour_cos": 0.1674503064050441,
+        "day_of_week_sin": 0.032437101909181365,
+        "day_of_week_cos": -0.007940989909684504,
+        "temp_diff": 1257520.0511893416,
+        "setpoint_diff": -687447.7575156766,
+        "total_solar_radiation": 3493547243.9715176
+    }
+}
