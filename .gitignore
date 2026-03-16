@@ -14,5 +14,8 @@ simulation_results_*/
 .vscode/
 .idea/
 
+# Claude Code
+.claude/
+
 # OS-specific
 .DS_Store
