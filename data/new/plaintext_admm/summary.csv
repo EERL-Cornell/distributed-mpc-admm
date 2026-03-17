@@ -1,0 +1,2 @@
+controller,peak_kW,cost_day,mean_iterations,mean_solve_time_s,comfort_violations
+plaintext_admm,10.744,20.618,5.5,1.316,0

@@ -164,12 +164,17 @@ All encryption calls flow through these 4 hooks. No other TenSEAL usage exists o
 
 ## 5. Environment Verification: R0.1–R0.4 (Critical)
 
-### R0.1 — FMU Availability: ⚠️ BLOCKED (wrong platform binaries)
+### R0.1 — FMU Availability: ✅ PASS (macOS)
 
 - All 4 FMU files are **present on disk**: `fmus/bldg{1-4}.fmu` (926–955 KB each)
 - **pyfmi is installed** in the `cdc` conda environment (v2.20.1, Python 3.12)
-- FMU files **fail to load**: `InvalidBinaryException: The FMU contains no binary for this platform` — the FMUs were compiled for macOS, not Linux
-- **Verdict:** BLOCKED for fresh simulation mode. Cached data mode is viable — the `data/` directory contains 2400-row CSV files for all 4 buildings covering the simulation period.
+- All 4 FMUs **load successfully** on macOS (Darwin 25.3.0) as `FMUModelCS2`:
+  - `bldg1.fmu` → `in_modified_updated_forFMU_SETPOINTS.idf`
+  - `bldg2.fmu` → `bld272_secondBldg_SETPOINTS.idf`
+  - `bldg3.fmu` → `in_forFMU_bld202_SETPOINTS.idf`
+  - `bldg4.fmu` → `in_modified_FMU_bld57693_SETPOINTS.idf`
+- **Verdict:** PASS — fresh simulation mode is available on macOS. (Note: the FMUs contain macOS binaries only; they will not load on Linux.)
+- **Re-assessed:** 2026-03-16, on macOS Darwin 25.3.0. Original assessment was on Linux where FMUs failed with `InvalidBinaryException`.
 
 ### R0.2 — Weather Data Match: ✅ PASS (indirect)
 
@@ -252,24 +257,17 @@ Weekend: all OFF_PEAK. (Simulation date Feb 20, 2018 = Tuesday, so weekday sched
 | seaborn | 0.13.2 | Installed |
 | pytest | 9.0.2 | Installed |
 
-**Note:** All required packages are installed. Fresh simulation runs are blocked only by the FMU platform mismatch (macOS binaries, Linux host), not by missing dependencies.
+**Note:** All required packages are installed. Fresh simulation runs are available on this macOS host (Darwin 25.3.0). All 4 FMUs load successfully via pyfmi.
 
 ---
 
 ## 7. Phase 1 Readiness Verdict
 
-### ❌ Phase 1 BLOCKED (fresh simulation mode)
+### ✅ Phase 1 READY (fresh simulation mode on macOS)
 
-**Reason:** The FMU files contain no Linux binaries (compiled for macOS). All Python dependencies are now installed in the `cdc` conda environment (Python 3.12), but the EnergyPlus co-simulation cannot run without platform-compatible FMU files.
+**Updated 2026-03-16:** All 4 FMUs load successfully on macOS (Darwin 25.3.0). All Python dependencies are installed in the `cdc` conda environment (Python 3.12). Fresh EnergyPlus co-simulation is available.
 
-### ❌ Phase 1 NOT READY (cached data mode)
-
-The `data/` directory contains pre-computed CSV files for all 4 buildings:
-- Input disturbances (10 weather/occupancy features, 2400 rows)
-- Zone temperature outputs (2400 rows)
-- HVAC power outputs (2400 rows, `P_hvac` column)
-
-These are **simulation inputs and historical/uncontrolled baselines** — they are the disturbance data fed *into* the simulation, NOT the results of any controller run.
+**All R0.x checks pass:** R0.1 ✅, R0.2 ✅, R0.3 ✅, R0.4 ✅, R0.5 ✅, R0.6 ⚠️ (heterogeneous bounds, not a blocker), R0.7 ✅, R0.8 ✅.
 
 ### Data Availability Assessment for Phase 2–3
 
@@ -285,17 +283,18 @@ These are **simulation inputs and historical/uncontrolled baselines** — they a
 | Historical zone temperatures | **YES** | `data/bldg{1-4}_outputs.csv` (2400 rows) |
 | Historical HVAC power | **YES** | `data/bldg{1-4}_hvac_outputs.csv` (2400 rows) |
 | AR model parameters | **YES** | `models/ar_model_parameters_bldg{1-4}.json` |
-| FMU building models | **YES** | `fmus/bldg{1-4}.fmu` (macOS binaries only) |
+| FMU building models | **YES** | `fmus/bldg{1-4}.fmu` (macOS binaries — loads on this host) |
 
-**Conclusion:** No simulation output data exists. Phase 2–3 analysis requires running `main.py` on a platform where the FMU files can load (macOS). The existing `data/` files are inputs and baselines only.
+**Conclusion:** No simulation output data exists yet. All infrastructure is in place to produce it on this macOS host.
 
 ### Recommended Next Steps
 
-1. **Run the simulation on macOS** — the FMU files contain macOS binaries. Clone this repo on a Mac, set up the `cdc` conda environment, and run `python main.py` to produce the encrypted ADMM outputs (`building_data_*.csv`, `admm_residuals_*.csv`, `admm_per_iteration_residuals_*.csv`).
-2. **Create the plaintext patch** (Phase 1) — the encryption bypass is well-localized to 4 hooks (DSO, PrivacyPreservingAgent, perform_random_chain_summation, solve_central_step). The plaintext mode can be created by:
+1. **Create the plaintext patch** (Phase 1) — the encryption bypass is well-localized to 4 hooks (DSO, PrivacyPreservingAgent, perform_random_chain_summation, solve_central_step). The plaintext mode can be created by:
    - Replacing `perform_random_chain_summation()` with a simple numpy sum
    - Modifying `solve_central_step()` to accept raw arrays instead of BFV vectors
    - Removing the `DSO` and `PrivacyPreservingAgent` requirements from the main loop
-3. **Run both encrypted and plaintext simulations on macOS** — save all output CSVs to `data/raw/encrypted_admm/` and `data/new/plaintext_admm/`.
-4. **Implement rule-based and uncoordinated MPC baselines** — either as separate scripts or by modifying `main.py` to support these modes.
-5. **Once outputs exist**, Phase 2–3 post-processing and figure generation can proceed on any platform (Linux or macOS).
+2. **Run encrypted ADMM** via `main.py` → save outputs to `data/raw/encrypted_admm/`.
+3. **Run plaintext ADMM** via the patched code → save outputs to `data/new/plaintext_admm/`.
+4. **Verify C1.1** — plaintext-vs-encrypted aggregate power difference < 0.01 kW for all 96 steps.
+5. **Implement rule-based and uncoordinated MPC baselines** — either as separate scripts or by modifying `main.py` to support these modes.
+6. **Once all 4 controller outputs exist**, Phase 2–3 post-processing and figure generation can proceed.

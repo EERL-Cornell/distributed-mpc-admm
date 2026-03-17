@@ -121,3 +121,30 @@ AR_MODEL_PATHS = {
     "bldg_3": "models/ar_model_parameters_bldg3.json",
     "bldg_4": "models/ar_model_parameters_bldg4.json",
 }
+
+# =============================================================================
+# Output Directories (relative to project root)
+# =============================================================================
+OUTPUT_DIRS = {
+    "rule_based": "data/raw/rule_based",
+    "uncoor_mpc": "data/raw/uncoor_mpc",
+    "encrypted_admm": "data/raw/encrypted_admm",
+    "plaintext_admm": "data/new/plaintext_admm",
+}
+
+# =============================================================================
+# Standardized CSV Column Definitions
+# =============================================================================
+BUILDING_DATA_COLUMNS = [
+    "k", "P_hvac_1", "P_hvac_2", "P_hvac_3", "P_hvac_4",
+    "P_agg", "T_1", "T_2", "T_3", "T_4", "cost_step",
+]
+
+ADMM_ITERATIONS_COLUMNS = [
+    "k", "l", "r_pri", "r_dual", "t_local", "t_comm", "t_encrypt", "t_total",
+]
+
+SUMMARY_COLUMNS = [
+    "controller", "peak_kW", "cost_day", "mean_iterations",
+    "mean_solve_time_s", "comfort_violations",
+]

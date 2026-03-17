@@ -19,3 +19,13 @@ simulation_results_*/
 
 # OS-specific
 .DS_Store
+
+# Project docs and specs (not tracked)
+CLAUDE.md
+docs/
+openspec/
+
+# EnergyPlus artifacts
+Output_EPExport_Model/
+*_SETPOINTS*.*
+*_log.txt
