@@ -16,6 +16,13 @@ simulation_results_*/
 
 # Claude Code
 .claude/
+CLAUDE.md
+
+# OpenSpec
+.openspec/
+
+# Docs
+docs/
 
 # OS-specific
 .DS_Store
