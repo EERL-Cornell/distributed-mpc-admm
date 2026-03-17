@@ -1,0 +1,5 @@
+controller,peak_kW,cost_day,mean_iterations,mean_solve_time_s,comfort_violations
+rule_based,18.354,30.309,0.0,0.0,116
+uncoor_mpc,16.662,23.138,0.0,0.0,0
+plaintext_admm,10.744,20.618,5.5,1.316,0
+encrypted_admm,10.7,20.6,,7.5,
